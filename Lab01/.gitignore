@@ -1,0 +1,5 @@
+.env
+__pycache__/
+*.pyc
+Sprint01/plans
+CLAUDE.md
