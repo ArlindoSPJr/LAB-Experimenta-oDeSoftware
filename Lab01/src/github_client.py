@@ -27,6 +27,15 @@ def _carregar_variaveis_do_env() -> None:
 _carregar_variaveis_do_env()
 
 
+def obter_quantidade_repos(padrao: int = 10) -> int:
+    """Lê `QUANTIDADE_REPOS` do ambiente (`.env`); usa `padrao` se não definida.
+
+    Ponto único de leitura desse parâmetro, para os módulos de RQ não precisarem
+    hardcodar o tamanho da amostra/coleta cada um no seu código.
+    """
+    return int(os.environ.get("QUANTIDADE_REPOS", padrao))
+
+
 class GitHubGraphQLError(Exception):
     """Levantada quando a API GraphQL do GitHub retorna erros ou falha HTTP."""
 
