@@ -110,6 +110,7 @@ def exportar_snapshot(token: str | None = None) -> list[dict]:
             break
         cursor = itens["pageInfo"]["endCursor"]
 
+    linhas.sort(key=lambda linha: linha["numero_issue"])
     return linhas
 
 
