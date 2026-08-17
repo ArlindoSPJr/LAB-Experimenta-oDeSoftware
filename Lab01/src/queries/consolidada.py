@@ -5,7 +5,7 @@ from pathlib import Path
 
 from src.github_client import GitHubGraphQLError, obter_quantidade_repos, run_query
 
-CAMINHO_CSV = Path(__file__).resolve().parent.parent.parent / "data" / "dataset" / "coleta_100.csv"
+CAMINHO_CSV = Path(__file__).resolve().parent.parent.parent / "data" / "dataset" / "coleta_1000.csv"
 
 QUERY_STRING_PADRAO = "stars:>1 sort:stars-desc"
 
