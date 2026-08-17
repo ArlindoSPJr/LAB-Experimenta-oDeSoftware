@@ -1,5 +1,6 @@
 import csv
 import time
+from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -21,6 +22,12 @@ TAMANHO_PAGINA_MINIMO = 5
 TENTATIVAS_POR_OFFSET = 4
 ESPERA_BASE_SEGUNDOS = 3
 
+# Métrica bônus: concentração do maior contribuidor. O GraphQL não expõe
+# estatística de contribuidores pronta, então aproximamos usando os autores
+# das N PRs aceitas mais recentes (amostra), em vez do histórico completo de
+# commits — isso seria inviável em escala para repositórios grandes.
+TAMANHO_AMOSTRA_PRS = 30
+
 
 def _buscar_pagina_com_retry(cursor: str | None, tamanho_pagina: int, token: str | None) -> tuple[dict, int]:
     """Busca uma página da query consolidada, encolhendo o tamanho pela metade a cada 502.
@@ -32,7 +39,12 @@ def _buscar_pagina_com_retry(cursor: str | None, tamanho_pagina: int, token: str
         try:
             dados = run_query(
                 montar_query_busca(),
-                {"queryString": QUERY_STRING_PADRAO, "quantidade": tamanho_pagina, "cursor": cursor},
+                {
+                    "queryString": QUERY_STRING_PADRAO,
+                    "quantidade": tamanho_pagina,
+                    "cursor": cursor,
+                    "amostraPrs": TAMANHO_AMOSTRA_PRS,
+                },
                 token=token,
             )
             return dados, tamanho_pagina
@@ -49,7 +61,7 @@ def _buscar_pagina_com_retry(cursor: str | None, tamanho_pagina: int, token: str
 def montar_query_busca() -> str:
     """Monta a query GraphQL consolidada com todos os campos das RQs 01 a 06."""
     return """
-    query($queryString: String!, $quantidade: Int!, $cursor: String) {
+    query($queryString: String!, $quantidade: Int!, $cursor: String, $amostraPrs: Int!) {
         search(query: $queryString, type: REPOSITORY, first: $quantidade, after: $cursor) {
             pageInfo {
                 hasNextPage
@@ -65,8 +77,11 @@ def montar_query_busca() -> str:
                     primaryLanguage {
                         name
                     }
-                    pullRequests(states: MERGED) {
+                    pullRequests(states: MERGED, first: $amostraPrs, orderBy: {field: CREATED_AT, direction: DESC}) {
                         totalCount
+                        nodes {
+                            author { login }
+                        }
                     }
                     releases {
                         totalCount
@@ -102,6 +117,19 @@ def calcular_razao_issues(fechadas: int, total: int) -> float:
     return round(fechadas / total, 4)
 
 
+def calcular_top_contribuidor(autores: list[str | None]) -> tuple[str, float]:
+    """Autor mais frequente entre as PRs amostradas e sua % de participação.
+
+    Retorna ("N/A", 0.0) se a amostra não tem PRs. Autores com `login` nulo
+    (conta deletada/anônima) são descartados da amostra.
+    """
+    logins = [autor for autor in autores if autor]
+    if not logins:
+        return "N/A", 0.0
+    login, quantidade = Counter(logins).most_common(1)[0]
+    return login, round(quantidade / len(logins), 4)
+
+
 def coletar(quantidade: int | None = None, token: str | None = None) -> list[dict]:
     """Coleta todos os campos das RQs 01–06, paginando via cursor com redução adaptativa.
 
@@ -126,6 +154,11 @@ def coletar(quantidade: int | None = None, token: str | None = None) -> list[dic
             fechadas = repo["issuesFechadas"]["totalCount"]
             total_issues = repo["issuesTotal"]["totalCount"]
             linguagem = repo["primaryLanguage"]
+            autores_prs = [
+                pr["author"]["login"] if pr["author"] else None
+                for pr in repo["pullRequests"]["nodes"]
+            ]
+            top_contribuidor, concentracao_top_contribuidor = calcular_top_contribuidor(autores_prs)
             linhas.append(
                 {
                     "repositorio": f"{repo['owner']['login']}/{repo['name']}",
@@ -140,6 +173,8 @@ def coletar(quantidade: int | None = None, token: str | None = None) -> list[dic
                     "issues_fechadas": fechadas,
                     "issues_total": total_issues,
                     "razao_issues_fechadas": calcular_razao_issues(fechadas, total_issues),
+                    "top_contribuidor": top_contribuidor,
+                    "concentracao_top_contribuidor": concentracao_top_contribuidor,
                 }
             )
 
@@ -158,6 +193,7 @@ CAMPOS_CSV = [
     "ultima_atualizacao", "dias_desde_atualizacao",
     "linguagem_primaria",
     "issues_fechadas", "issues_total", "razao_issues_fechadas",
+    "top_contribuidor", "concentracao_top_contribuidor",
 ]
 
 
