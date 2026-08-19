@@ -28,6 +28,15 @@ ESPERA_BASE_SEGUNDOS = 3
 # commits — isso seria inviável em escala para repositórios grandes.
 TAMANHO_AMOSTRA_PRS = 30
 
+# Métrica bônus: popularidade via forks. Estrelas medem interesse/atenção;
+# forks medem reaproveitamento efetivo do código (quantas pessoas partiram
+# do repositório para desenvolver algo próprio) — sinal complementar de
+# popularidade, disponível direto no campo forkCount do repositório.
+
+# Métrica bônus: licença do repositório. Sistemas populares tendem a adotar
+# licenças permissivas (MIT, Apache-2.0) para facilitar adoção/contribuição
+# externa? Disponível direto no campo licenseInfo do repositório.
+
 
 def _buscar_pagina_com_retry(cursor: str | None, tamanho_pagina: int, token: str | None) -> tuple[dict, int]:
     """Busca uma página da query consolidada, encolhendo o tamanho pela metade a cada 502.
@@ -72,9 +81,13 @@ def montar_query_busca() -> str:
                     name
                     owner { login }
                     stargazerCount
+                    forkCount
                     createdAt
                     updatedAt
                     primaryLanguage {
+                        name
+                    }
+                    licenseInfo {
                         name
                     }
                     pullRequests(states: MERGED, first: $amostraPrs, orderBy: {field: CREATED_AT, direction: DESC}) {
@@ -154,6 +167,7 @@ def coletar(quantidade: int | None = None, token: str | None = None) -> list[dic
             fechadas = repo["issuesFechadas"]["totalCount"]
             total_issues = repo["issuesTotal"]["totalCount"]
             linguagem = repo["primaryLanguage"]
+            licenca = repo["licenseInfo"]
             autores_prs = [
                 pr["author"]["login"] if pr["author"] else None
                 for pr in repo["pullRequests"]["nodes"]
@@ -163,6 +177,7 @@ def coletar(quantidade: int | None = None, token: str | None = None) -> list[dic
                 {
                     "repositorio": f"{repo['owner']['login']}/{repo['name']}",
                     "estrelas": repo["stargazerCount"],
+                    "total_forks": repo["forkCount"],
                     "data_criacao": repo["createdAt"],
                     "idade_anos": calcular_idade_anos(repo["createdAt"]),
                     "total_prs_aceitas": repo["pullRequests"]["totalCount"],
@@ -170,6 +185,7 @@ def coletar(quantidade: int | None = None, token: str | None = None) -> list[dic
                     "ultima_atualizacao": repo["updatedAt"],
                     "dias_desde_atualizacao": calcular_dias_desde_atualizacao(repo["updatedAt"]),
                     "linguagem_primaria": linguagem["name"] if linguagem else "N/A",
+                    "licenca": licenca["name"] if licenca else "N/A",
                     "issues_fechadas": fechadas,
                     "issues_total": total_issues,
                     "razao_issues_fechadas": calcular_razao_issues(fechadas, total_issues),
@@ -186,12 +202,12 @@ def coletar(quantidade: int | None = None, token: str | None = None) -> list[dic
 
 
 CAMPOS_CSV = [
-    "repositorio", "estrelas",
+    "repositorio", "estrelas", "total_forks",
     "data_criacao", "idade_anos",
     "total_prs_aceitas",
     "total_releases",
     "ultima_atualizacao", "dias_desde_atualizacao",
-    "linguagem_primaria",
+    "linguagem_primaria", "licenca",
     "issues_fechadas", "issues_total", "razao_issues_fechadas",
     "top_contribuidor", "concentracao_top_contribuidor",
 ]
