@@ -1,0 +1,24 @@
+numero_issue,titulo,status,responsaveis,url
+1,Setup do GitHub Projects,Done,ArlindoSPJr,https://github.com/ArlindoSPJr/LAB-Experimenta-oDeSoftware/issues/1
+2,LAB01-SP01-Setup do client de comunicação com a API do GitHub,Done,ArlindoSPJr,https://github.com/ArlindoSPJr/LAB-Experimenta-oDeSoftware/issues/2
+3,Implementação e validação RQ1,Done,ArlindoSPJr,https://github.com/ArlindoSPJr/LAB-Experimenta-oDeSoftware/issues/3
+4,Implementação e validação RQ2,Done,ArthurAstolfi,https://github.com/ArlindoSPJr/LAB-Experimenta-oDeSoftware/issues/4
+5,Implementação e validação RQ3,Done,ArlindoSPJr,https://github.com/ArlindoSPJr/LAB-Experimenta-oDeSoftware/issues/5
+6,Implementação e validação RQ4,Done,ArthurAstolfi,https://github.com/ArlindoSPJr/LAB-Experimenta-oDeSoftware/issues/6
+7,Implementação e validação RQ5,Done,ArthurAstolfi,https://github.com/ArlindoSPJr/LAB-Experimenta-oDeSoftware/issues/7
+8,Implementação e validação RQ6,Done,ArthurAstolfi,https://github.com/ArlindoSPJr/LAB-Experimenta-oDeSoftware/issues/8
+11,Consolidar query única do grupo,Done,ArthurAstolfi,https://github.com/ArlindoSPJr/LAB-Experimenta-oDeSoftware/issues/11
+12,Script de requisição automática,Done,ArlindoSPJr,https://github.com/ArlindoSPJr/LAB-Experimenta-oDeSoftware/issues/12
+20,Snapshot de fechamento de sprint,Done,,https://github.com/ArlindoSPJr/LAB-Experimenta-oDeSoftware/issues/20
+22,Paginação (Consulta para 1000 repositórios),Done,ArlindoSPJr,https://github.com/ArlindoSPJr/LAB-Experimenta-oDeSoftware/issues/22
+23,Primeira versão do relatório com hipóteses informais,To Do,CamszMelo,https://github.com/ArlindoSPJr/LAB-Experimenta-oDeSoftware/issues/23
+31,Relatório final - introdução com hipóteses informais sobre as RQs,Backlog,,https://github.com/ArlindoSPJr/LAB-Experimenta-oDeSoftware/issues/31
+32,Executar snapshot fechamento de sprint 02,To Do,,https://github.com/ArlindoSPJr/LAB-Experimenta-oDeSoftware/issues/32
+33,Executar snapshot fechamento de sprint 03,Backlog,,https://github.com/ArlindoSPJr/LAB-Experimenta-oDeSoftware/issues/33
+34,Relatório final - Metodologia de coleta,Backlog,,https://github.com/ArlindoSPJr/LAB-Experimenta-oDeSoftware/issues/34
+35,"Relatório final - Resultados por RQ (valores medianos, contagem por categoria quando aplicável)",Backlog,,https://github.com/ArlindoSPJr/LAB-Experimenta-oDeSoftware/issues/35
+36,Relatório final - Discussão hipótese vs. resultado,Backlog,,https://github.com/ArlindoSPJr/LAB-Experimenta-oDeSoftware/issues/36
+37,Relatório final - Configuração do Processo,Backlog,,https://github.com/ArlindoSPJr/LAB-Experimenta-oDeSoftware/issues/37
+38,Front-end para exibição das métricas,Done,ArthurAstolfi,https://github.com/ArlindoSPJr/LAB-Experimenta-oDeSoftware/issues/38
+39,Métrica de porcentagem de contribuição,Done,ArlindoSPJr,https://github.com/ArlindoSPJr/LAB-Experimenta-oDeSoftware/issues/39
+41,Implementação e validação métricas bônus — Forks e Licença,Backlog,CamszMelo,https://github.com/ArlindoSPJr/LAB-Experimenta-oDeSoftware/issues/41
