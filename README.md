@@ -68,3 +68,21 @@ O script:
 4. Salva o resultado no caminho definido pela constante `CAMINHO_SNAPSHOT`, em `Lab01/src/snapshot_projeto.py` — hoje `Lab01/Sprint01/snapshot_sprint01.csv`.
 
 **Importante:** antes de rodar em uma nova sprint, edite `CAMINHO_SNAPSHOT` em `Lab01/src/snapshot_projeto.py` para apontar para o nome/pasta da sprint corrente (ex.: `Lab01/Sprint02/snapshot_sprint02.csv`), para não sobrescrever o snapshot da sprint anterior.
+
+### Front-end (dashboard Streamlit)
+
+Dashboard para explorar os repositórios coletados (`Lab01/data/dataset/coleta_1000.csv`): filtros por linguagem, licença, faixa de estrelas e idade, tabela paginada com todas as métricas e gráficos gerais.
+
+1. Instale as dependências (só usadas pelo front — a coleta continua sem dependências externas):
+
+   ```
+   pip install -r Lab01/front/requirements.txt
+   ```
+
+2. A partir da raiz do repositório:
+
+   ```
+   streamlit run Lab01/front/app.py
+   ```
+
+   Abre em `http://localhost:8501`. Rode a coleta consolidada antes (veja acima) para o CSV existir.
