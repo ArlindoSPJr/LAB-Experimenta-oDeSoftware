@@ -37,6 +37,13 @@ TAMANHO_AMOSTRA_PRS = 30
 # licenças permissivas (MIT, Apache-2.0) para facilitar adoção/contribuição
 # externa? Disponível direto no campo licenseInfo do repositório.
 
+# RQ VIII: sistemas populares raramente são arquivados/descontinuados?
+# Diferente da RQ IV (que mede recência de atualização), isArchived reflete
+# o abandono formal declarado pelo dono do repositório.
+
+# RQ IX: sistemas populares já adotam "main" como branch padrão, em vez de
+# "master"? Métrica categórica via defaultBranchRef.name.
+
 
 def _buscar_pagina_com_retry(cursor: str | None, tamanho_pagina: int, token: str | None) -> tuple[dict, int]:
     """Busca uma página da query consolidada, encolhendo o tamanho pela metade a cada 502.
@@ -88,6 +95,10 @@ def montar_query_busca() -> str:
                         name
                     }
                     licenseInfo {
+                        name
+                    }
+                    isArchived
+                    defaultBranchRef {
                         name
                     }
                     pullRequests(states: MERGED, first: $amostraPrs, orderBy: {field: CREATED_AT, direction: DESC}) {
@@ -168,6 +179,7 @@ def coletar(quantidade: int | None = None, token: str | None = None) -> list[dic
             total_issues = repo["issuesTotal"]["totalCount"]
             linguagem = repo["primaryLanguage"]
             licenca = repo["licenseInfo"]
+            branch_padrao = repo["defaultBranchRef"]
             autores_prs = [
                 pr["author"]["login"] if pr["author"] else None
                 for pr in repo["pullRequests"]["nodes"]
@@ -186,6 +198,8 @@ def coletar(quantidade: int | None = None, token: str | None = None) -> list[dic
                     "dias_desde_atualizacao": calcular_dias_desde_atualizacao(repo["updatedAt"]),
                     "linguagem_primaria": linguagem["name"] if linguagem else "N/A",
                     "licenca": licenca["name"] if licenca else "N/A",
+                    "arquivado": repo["isArchived"],
+                    "branch_padrao": branch_padrao["name"] if branch_padrao else "N/A",
                     "issues_fechadas": fechadas,
                     "issues_total": total_issues,
                     "razao_issues_fechadas": calcular_razao_issues(fechadas, total_issues),
@@ -207,7 +221,7 @@ CAMPOS_CSV = [
     "total_prs_aceitas",
     "total_releases",
     "ultima_atualizacao", "dias_desde_atualizacao",
-    "linguagem_primaria", "licenca",
+    "linguagem_primaria", "licenca", "arquivado", "branch_padrao",
     "issues_fechadas", "issues_total", "razao_issues_fechadas",
     "top_contribuidor", "concentracao_top_contribuidor",
 ]

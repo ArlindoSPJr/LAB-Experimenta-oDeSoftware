@@ -26,6 +26,14 @@
 **RQ VII - Sistemas escritos em linguagens mais populares recebem mais contribuição externa, lançam mais releases e são atualizados com mais frequência? (divida os resultados das RQs 02, 03 e 04 por linguagem)**
 *Resposta: Não necessariamente, existem diversos repositórios ativos que recebem uma alta taxa de contribuição, mas que são escritos em linguagens antigas.*
 
+**RQ VIII - Sistemas populares raramente são arquivados/descontinuados?**
+*Métrica: `isArchived` do repositório.*
+*Resposta: Sim, é esperado que a grande maioria dos repositórios populares esteja ativa — um projeto precisa de manutenção contínua para atrair e manter estrelas, então o arquivamento (abandono formal declarado pelo dono) deve ser raro nesse grupo, mesmo entre os mais antigos.*
+
+**RQ IX - Sistemas populares já adotam "main" como branch padrão, em vez de "master"?**
+*Métrica: `defaultBranchRef.name` do repositório.*
+*Resposta: A maioria deve usar "main", já que o GitHub passou a criar novos repositórios com esse nome por padrão desde 2020 e incentivou a migração de repositórios antigos. Repositórios mais antigos e populares, porém, podem manter "master" caso nunca tenham feito a migração manual.*
+
 
 **SEÇÃO II - Metodologia de coleta**
 

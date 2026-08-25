@@ -21,6 +21,8 @@ def _repo(
     atualizado="2023-06-01T00:00:00Z",
     linguagem={"name": "Python"},
     licenca={"name": "MIT License"},
+    arquivado=False,
+    branch_padrao="main",
     autores_prs=("alice",),
     total_prs=10,
     releases=3,
@@ -37,6 +39,8 @@ def _repo(
         "updatedAt": atualizado,
         "primaryLanguage": linguagem,
         "licenseInfo": licenca,
+        "isArchived": arquivado,
+        "defaultBranchRef": {"name": branch_padrao} if branch_padrao is not None else None,
         "pullRequests": {
             "totalCount": total_prs,
             "nodes": [{"author": {"login": autor} if autor else None} for autor in autores_prs],
@@ -205,6 +209,8 @@ def test_coletar__linha_resultante_possui_todas_as_chaves_e_valores_corretos():
         atualizado="2023-06-01T00:00:00Z",
         linguagem={"name": "Python"},
         licenca={"name": "MIT License"},
+        arquivado=False,
+        branch_padrao="main",
         autores_prs=("alice", "alice", "bob"),
         total_prs=15,
         releases=4,
@@ -216,6 +222,8 @@ def test_coletar__linha_resultante_possui_todas_as_chaves_e_valores_corretos():
         dono="dono-sem-meta",
         linguagem=None,
         licenca=None,
+        arquivado=True,
+        branch_padrao=None,
         autores_prs=(),
         issues_fechadas=0,
         issues_total=0,
@@ -239,6 +247,8 @@ def test_coletar__linha_resultante_possui_todas_as_chaves_e_valores_corretos():
         "dias_desde_atualizacao",
         "linguagem_primaria",
         "licenca",
+        "arquivado",
+        "branch_padrao",
         "issues_fechadas",
         "issues_total",
         "razao_issues_fechadas",
@@ -259,6 +269,8 @@ def test_coletar__linha_resultante_possui_todas_as_chaves_e_valores_corretos():
     assert linha_completa["ultima_atualizacao"] == "2023-06-01T00:00:00Z"
     assert linha_completa["linguagem_primaria"] == "Python", "Quando primaryLanguage existe, deve usar o nome real"
     assert linha_completa["licenca"] == "MIT License", "Quando licenseInfo existe, deve usar o nome real"
+    assert linha_completa["arquivado"] is False
+    assert linha_completa["branch_padrao"] == "main", "Quando defaultBranchRef existe, deve usar o nome real"
     assert linha_completa["issues_fechadas"] == 8
     assert linha_completa["issues_total"] == 10
     assert linha_completa["razao_issues_fechadas"] == round(8 / 10, 4)
@@ -267,6 +279,8 @@ def test_coletar__linha_resultante_possui_todas_as_chaves_e_valores_corretos():
 
     assert linha_sem_meta["linguagem_primaria"] == "N/A", "primaryLanguage=None deve resultar em 'N/A'"
     assert linha_sem_meta["licenca"] == "N/A", "licenseInfo=None deve resultar em 'N/A'"
+    assert linha_sem_meta["arquivado"] is True
+    assert linha_sem_meta["branch_padrao"] == "N/A", "defaultBranchRef=None deve resultar em 'N/A'"
     assert linha_sem_meta["top_contribuidor"] == "N/A", "Sem PRs com autor, o top contribuidor deve ser 'N/A'"
     assert linha_sem_meta["concentracao_top_contribuidor"] == 0.0
     assert linha_sem_meta["razao_issues_fechadas"] == 0.0, "Quando issues_total=0, a razão deve ser 0.0"
