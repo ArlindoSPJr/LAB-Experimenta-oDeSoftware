@@ -37,10 +37,6 @@ TAMANHO_AMOSTRA_PRS = 30
 # licenças permissivas (MIT, Apache-2.0) para facilitar adoção/contribuição
 # externa? Disponível direto no campo licenseInfo do repositório.
 
-# RQ VIII: sistemas populares raramente são arquivados/descontinuados?
-# Diferente da RQ IV (que mede recência de atualização), isArchived reflete
-# o abandono formal declarado pelo dono do repositório.
-
 
 def _buscar_pagina_com_retry(cursor: str | None, tamanho_pagina: int, token: str | None) -> tuple[dict, int]:
     """Busca uma página da query consolidada, encolhendo o tamanho pela metade a cada 502.
@@ -94,7 +90,6 @@ def montar_query_busca() -> str:
                     licenseInfo {
                         name
                     }
-                    isArchived
                     pullRequests(states: MERGED, first: $amostraPrs, orderBy: {field: CREATED_AT, direction: DESC}) {
                         totalCount
                         nodes {
@@ -191,7 +186,6 @@ def coletar(quantidade: int | None = None, token: str | None = None) -> list[dic
                     "dias_desde_atualizacao": calcular_dias_desde_atualizacao(repo["updatedAt"]),
                     "linguagem_primaria": linguagem["name"] if linguagem else "N/A",
                     "licenca": licenca["name"] if licenca else "N/A",
-                    "arquivado": repo["isArchived"],
                     "issues_fechadas": fechadas,
                     "issues_total": total_issues,
                     "razao_issues_fechadas": calcular_razao_issues(fechadas, total_issues),
@@ -213,7 +207,7 @@ CAMPOS_CSV = [
     "total_prs_aceitas",
     "total_releases",
     "ultima_atualizacao", "dias_desde_atualizacao",
-    "linguagem_primaria", "licenca", "arquivado",
+    "linguagem_primaria", "licenca",
     "issues_fechadas", "issues_total", "razao_issues_fechadas",
     "top_contribuidor", "concentracao_top_contribuidor",
 ]
