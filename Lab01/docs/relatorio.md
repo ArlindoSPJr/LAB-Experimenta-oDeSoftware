@@ -35,6 +35,23 @@
 *Resposta: A maioria deve usar "main", já que o GitHub passou a criar novos repositórios com esse nome por padrão desde 2020 e incentivou a migração de repositórios antigos. Repositórios mais antigos e populares, porém, podem manter "master" caso nunca tenham feito a migração manual.*
 
 
+**SEÇÃO II - Metodologia de coleta**
+
+*Fonte e ferramenta: API GraphQL do GitHub (`https://api.github.com/graphql`), consumida por script próprio em Python (só biblioteca padrão, sem dependências de terceiros para acesso à API — ver `Lab01/src/github_client.py`), autenticado via Personal Access Token com escopos `public_repo` e `read:project`.*
+
+*Critério de seleção: os 1.000 repositórios com maior número de estrelas no GitHub, via `search(query: "stars:>1 sort:stars-desc", type: REPOSITORY)`.*
+
+*Coleta consolidada: uma única query GraphQL (`Lab01/src/queries/consolidada.py`) traz, numa única passada por repositório, todos os campos usados pelas RQ I a IX e pelas métricas bônus (concentração do maior contribuidor, forks, licença): data de criação, data da última atualização, linguagem primária, licença, status de arquivamento, branch padrão, total de releases, total de PRs aceitas (com os autores de uma amostra das 30 PRs mais recentes) e issues (abertas/fechadas).*
+
+*Paginação: via cursor (`after`), com tamanho de página adaptativo — a busca começa pedindo 25 repositórios por página e reduz o tamanho pela metade automaticamente quando a API responde com erro 502 (o resolver do GitHub estoura o timeout interno por causa das 4 conexões aninhadas por repositório: pullRequests, releases e as 2 variações de issues), com até 4 tentativas por página e espera crescente entre elas, até reunir os 1.000 repositórios.*
+
+*Validação incremental: cada métrica foi primeiro implementada e testada isoladamente numa amostra pequena de 5–10 repositórios (scripts individuais `rq01.py` a `rq09.py` e `rq_bonus_*.py`, com saída em `Lab01/data/amostras/`), antes de ser integrada à query única de coleta em massa — evitando gastar tempo/requisições rodando os 1.000 repositórios com uma métrica ainda não validada.*
+
+*Armazenamento: resultado salvo em CSV (`Lab01/data/dataset/coleta_1000.csv`), com 998 repositórios válidos coletados dos 1.000 buscados. Última coleta completa realizada em 20/08/2026 — ainda não inclui as colunas de arquivamento (RQ VIII) e branch padrão (RQ IX), adicionadas depois; requer nova rodada de coleta para preencher os resultados dessas duas RQs na Seção IV.*
+
+*Testes automatizados: a partir da Sprint02, toda métrica nova passou a exigir teste unitário correspondente (mockando a resposta da API), rodado automaticamente via GitHub Actions a cada push/PR para a `main` (`Lab01/tests/`, `.github/workflows/tests.yml`).*
+
+
 **SEÇÃO IV - Discussão hipóteses vs Resultado**
 
 *Base: coleta consolidada com 998 repositórios válidos (de 1.000 buscados) em `Lab01/data/dataset/coleta_1000.csv`.*
