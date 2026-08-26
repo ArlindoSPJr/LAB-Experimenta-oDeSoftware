@@ -5,7 +5,7 @@ from pathlib import Path
 from src.github_client import GitHubGraphQLError, run_query
 
 # Atualizar a cada nova sprint (nome/pasta do snapshot desta sprint).
-CAMINHO_SNAPSHOT = Path(__file__).resolve().parent.parent / "sprint02" / "snapshot_sprint02.csv"
+CAMINHO_SNAPSHOT = Path(__file__).resolve().parent.parent / "sprint03" / "snapshot_sprint03.csv"
 
 DONO_PROJETO = os.environ.get("GITHUB_PROJECT_OWNER")
 TIPO_DONO_PROJETO = os.environ.get("GITHUB_PROJECT_OWNER_TYPE", "user")
