@@ -52,6 +52,59 @@
 *Testes automatizados: a partir da Sprint02, toda métrica nova passou a exigir teste unitário correspondente (mockando a resposta da API), rodado automaticamente via GitHub Actions a cada push/PR para a `main` (`Lab01/tests/`, `.github/workflows/tests.yml`).*
 
 
+**SEÇÃO III - Resultados por RQ**
+
+*Base: coleta consolidada com 998 repositórios válidos (de 1.000 buscados) em `Lab01/data/dataset/coleta_1000.csv`.*
+
+**RQ I - Idade do repositório**
+*Mediana: 7,72 anos | Mínimo: 0,02 anos | Máximo: 18,36 anos*
+
+**RQ II - Total de pull requests aceitas**
+*Mediana: 768 PRs | Mínimo: 0 | Máximo: 103.387*
+
+**RQ III - Total de releases**
+*Mediana: 39 releases | 286 repositórios (28,7%) sem nenhuma release*
+
+**RQ IV - Dias desde a última atualização**
+*Mediana: 0 dias | 998 repositórios (100%) atualizados nos últimos 30 dias*
+
+**RQ V - Linguagem primária (contagem por categoria, top 10)**
+
+| Linguagem | Repositórios |
+|---|---|
+| Python | 227 |
+| TypeScript | 173 |
+| JavaScript | 110 |
+| N/A (sem linguagem identificada) | 87 |
+| Go | 77 |
+| Rust | 57 |
+| C++ | 41 |
+| Java | 41 |
+| Jupyter Notebook | 24 |
+| C | 21 |
+
+**RQ VI - Razão de issues fechadas**
+*Mediana: 0,864 (86,4%) | 721 repositórios (72,2%) com razão ≥ 0,70*
+
+**RQ VII - PRs, releases e atualização por linguagem (mediana, linguagens mais frequentes)**
+
+| Linguagem | Mediana PRs aceitas | Mediana releases | Mediana dias desde atualização |
+|---|---|---|---|
+| Python | 559 | 20 | 0 |
+| TypeScript | 1.979 | 134 | 0 |
+| JavaScript | 630,5 | 38 | 0 |
+| Go | 1.958 | 140 | 0 |
+| Rust | 2.212 | 75 | 0 |
+
+**RQ VIII - Status de arquivamento** e **RQ IX - Branch padrão**
+*Pendente: as colunas `arquivado` e `branch_padrao` foram adicionadas à coleta consolidada depois da última rodada completa (20/08/2026). Requer nova execução de `python -m src.queries.consolidada` com os 1.000 repositórios para gerar os valores.*
+
+**Bônus - Métricas complementares**
+*Forks: mediana de 6.348 (mínimo 39, máximo 109.021).*
+*Concentração do maior contribuidor: mediana de 0,333 (33,3%) entre os 978 repositórios com PRs identificáveis na amostra.*
+*Licença (contagem, top 5): MIT License (393), Apache License 2.0 (181), Other (148), N/A/sem licença (83), GNU GPL v3.0 (50).*
+
+
 **SEÇÃO IV - Discussão hipóteses vs Resultado**
 
 *Base: coleta consolidada com 998 repositórios válidos (de 1.000 buscados) em `Lab01/data/dataset/coleta_1000.csv`.*
