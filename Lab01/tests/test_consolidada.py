@@ -23,6 +23,8 @@ def _repo(
     licenca={"name": "MIT License"},
     arquivado=False,
     branch_padrao="main",
+    discussions_habilitado=False,
+    plataformas_funding=(),
     autores_prs=("alice",),
     total_prs=10,
     releases=3,
@@ -41,6 +43,8 @@ def _repo(
         "licenseInfo": licenca,
         "isArchived": arquivado,
         "defaultBranchRef": {"name": branch_padrao} if branch_padrao is not None else None,
+        "hasDiscussionsEnabled": discussions_habilitado,
+        "fundingLinks": [{"platform": plataforma} for plataforma in plataformas_funding],
         "pullRequests": {
             "totalCount": total_prs,
             "nodes": [{"author": {"login": autor} if autor else None} for autor in autores_prs],
@@ -211,6 +215,8 @@ def test_coletar__linha_resultante_possui_todas_as_chaves_e_valores_corretos():
         licenca={"name": "MIT License"},
         arquivado=False,
         branch_padrao="main",
+        discussions_habilitado=True,
+        plataformas_funding=("GITHUB", "OPEN_COLLECTIVE"),
         autores_prs=("alice", "alice", "bob"),
         total_prs=15,
         releases=4,
@@ -224,6 +230,8 @@ def test_coletar__linha_resultante_possui_todas_as_chaves_e_valores_corretos():
         licenca=None,
         arquivado=True,
         branch_padrao=None,
+        discussions_habilitado=False,
+        plataformas_funding=(),
         autores_prs=(),
         issues_fechadas=0,
         issues_total=0,
@@ -249,6 +257,9 @@ def test_coletar__linha_resultante_possui_todas_as_chaves_e_valores_corretos():
         "licenca",
         "arquivado",
         "branch_padrao",
+        "discussions_habilitado",
+        "possui_funding",
+        "plataformas_funding",
         "issues_fechadas",
         "issues_total",
         "razao_issues_fechadas",
@@ -271,6 +282,11 @@ def test_coletar__linha_resultante_possui_todas_as_chaves_e_valores_corretos():
     assert linha_completa["licenca"] == "MIT License", "Quando licenseInfo existe, deve usar o nome real"
     assert linha_completa["arquivado"] is False
     assert linha_completa["branch_padrao"] == "main", "Quando defaultBranchRef existe, deve usar o nome real"
+    assert linha_completa["discussions_habilitado"] is True
+    assert linha_completa["possui_funding"] is True, "Deve ser True quando fundingLinks não é vazio"
+    assert linha_completa["plataformas_funding"] == "GITHUB;OPEN_COLLECTIVE", (
+        "As plataformas devem ser concatenadas na ordem recebida"
+    )
     assert linha_completa["issues_fechadas"] == 8
     assert linha_completa["issues_total"] == 10
     assert linha_completa["razao_issues_fechadas"] == round(8 / 10, 4)
@@ -281,6 +297,9 @@ def test_coletar__linha_resultante_possui_todas_as_chaves_e_valores_corretos():
     assert linha_sem_meta["licenca"] == "N/A", "licenseInfo=None deve resultar em 'N/A'"
     assert linha_sem_meta["arquivado"] is True
     assert linha_sem_meta["branch_padrao"] == "N/A", "defaultBranchRef=None deve resultar em 'N/A'"
+    assert linha_sem_meta["discussions_habilitado"] is False
+    assert linha_sem_meta["possui_funding"] is False, "Deve ser False quando fundingLinks vem vazio"
+    assert linha_sem_meta["plataformas_funding"] == "N/A", "Sem fundingLinks, o campo deve ser 'N/A'"
     assert linha_sem_meta["top_contribuidor"] == "N/A", "Sem PRs com autor, o top contribuidor deve ser 'N/A'"
     assert linha_sem_meta["concentracao_top_contribuidor"] == 0.0
     assert linha_sem_meta["razao_issues_fechadas"] == 0.0, "Quando issues_total=0, a razão deve ser 0.0"

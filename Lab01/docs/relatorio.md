@@ -34,6 +34,14 @@
 *Métrica: `defaultBranchRef.name` do repositório.*
 *Resposta: A maioria deve usar "main", já que o GitHub passou a criar novos repositórios com esse nome por padrão desde 2020 e incentivou a migração de repositórios antigos. Repositórios mais antigos e populares, porém, podem manter "master" caso nunca tenham feito a migração manual.*
 
+**RQ X - Sistemas populares adotam GitHub Discussions como canal de comunidade, além de Issues/PRs?**
+*Métrica: `hasDiscussionsEnabled` do repositório.*
+*Resposta: Não deve ser maioria. Discussions é um recurso opcional e mais recente que Issues; repositórios populares tendem a já ter um fluxo de comunidade consolidado em Issues/PRs (e às vezes em canais externos, como Discord/Slack), então esperamos habilitação relevante só numa minoria — mais comum em projetos grandes com necessidade de separar dúvidas de uso de bugs reais.*
+
+**RQ XI - Sistemas populares recebem apoio financeiro direto via GitHub Sponsors/funding?**
+*Métrica: presença de `fundingLinks` (lista de plataformas de financiamento configuradas).*
+*Resposta: Deve ser uma minoria pequena. Configurar `fundingLinks` exige uma ação deliberada do mantenedor (criar `FUNDING.yml`), e nem todo projeto popular tem um mantenedor individual buscando patrocínio — muitos são mantidos por empresas ou organizações que já monetizam o produto por outra via, então esperamos essa métrica concentrada em projetos individuais/comunitários.*
+
 
 **SEÇÃO II - Metodologia de coleta**
 
@@ -41,13 +49,13 @@
 
 *Critério de seleção: os 1.000 repositórios com maior número de estrelas no GitHub, via `search(query: "stars:>1 sort:stars-desc", type: REPOSITORY)`.*
 
-*Coleta consolidada: uma única query GraphQL (`Lab01/src/queries/consolidada.py`) traz, numa única passada por repositório, todos os campos usados pelas RQ I a IX e pelas métricas bônus (concentração do maior contribuidor, forks, licença): data de criação, data da última atualização, linguagem primária, licença, status de arquivamento, branch padrão, total de releases, total de PRs aceitas (com os autores de uma amostra das 30 PRs mais recentes) e issues (abertas/fechadas).*
+*Coleta consolidada: uma única query GraphQL (`Lab01/src/queries/consolidada.py`) traz, numa única passada por repositório, todos os campos usados pelas RQ I a XI e pelas métricas bônus (concentração do maior contribuidor, forks, licença): data de criação, data da última atualização, linguagem primária, licença, status de arquivamento, branch padrão, Discussions habilitado, plataformas de financiamento (funding), total de releases, total de PRs aceitas (com os autores de uma amostra das 30 PRs mais recentes) e issues (abertas/fechadas).*
 
 *Paginação: via cursor (`after`), com tamanho de página adaptativo — a busca começa pedindo 25 repositórios por página e reduz o tamanho pela metade automaticamente quando a API responde com erro 502 (o resolver do GitHub estoura o timeout interno por causa das 4 conexões aninhadas por repositório: pullRequests, releases e as 2 variações de issues), com até 4 tentativas por página e espera crescente entre elas, até reunir os 1.000 repositórios.*
 
-*Validação incremental: cada métrica foi primeiro implementada e testada isoladamente numa amostra pequena de 5–10 repositórios (scripts individuais `rq01.py` a `rq09.py` e `rq_bonus_*.py`, com saída em `Lab01/data/amostras/`), antes de ser integrada à query única de coleta em massa — evitando gastar tempo/requisições rodando os 1.000 repositórios com uma métrica ainda não validada.*
+*Validação incremental: cada métrica foi primeiro implementada e testada isoladamente numa amostra pequena de 5–10 repositórios (scripts individuais `rq01.py` a `rq11.py` e `rq_bonus_*.py`, com saída em `Lab01/data/amostras/`), antes de ser integrada à query única de coleta em massa — evitando gastar tempo/requisições rodando os 1.000 repositórios com uma métrica ainda não validada.*
 
-*Armazenamento: resultado salvo em CSV (`Lab01/data/dataset/coleta_1000.csv`), com 998 repositórios válidos coletados dos 1.000 buscados. Última coleta completa realizada em 20/08/2026 — ainda não inclui as colunas de arquivamento (RQ VIII) e branch padrão (RQ IX), adicionadas depois; requer nova rodada de coleta para preencher os resultados dessas duas RQs na Seção IV.*
+*Armazenamento: resultado salvo em CSV (`Lab01/data/dataset/coleta_1000.csv`), com 998 repositórios válidos coletados dos 1.000 buscados. Última coleta completa realizada em 20/08/2026 — ainda não inclui as colunas de arquivamento (RQ VIII), branch padrão (RQ IX), Discussions (RQ X) e funding (RQ XI), adicionadas depois; requer nova rodada de coleta para preencher os resultados dessas RQs na Seção IV.*
 
 *Testes automatizados: a partir da Sprint02, toda métrica nova passou a exigir teste unitário correspondente (mockando a resposta da API), rodado automaticamente via GitHub Actions a cada push/PR para a `main` (`Lab01/tests/`, `.github/workflows/tests.yml`).*
 
