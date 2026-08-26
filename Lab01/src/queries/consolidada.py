@@ -44,6 +44,13 @@ TAMANHO_AMOSTRA_PRS = 30
 # RQ IX: sistemas populares já adotam "main" como branch padrão, em vez de
 # "master"? Métrica categórica via defaultBranchRef.name.
 
+# RQ X: sistemas populares adotam GitHub Discussions como canal de
+# comunidade, além de Issues/PRs? Métrica booleana via hasDiscussionsEnabled.
+
+# RQ XI: sistemas populares recebem apoio financeiro direto (GitHub
+# Sponsors e afins)? Métrica via fundingLinks — lista de plataformas de
+# financiamento configuradas no FUNDING.yml do repositório.
+
 
 def _buscar_pagina_com_retry(cursor: str | None, tamanho_pagina: int, token: str | None) -> tuple[dict, int]:
     """Busca uma página da query consolidada, encolhendo o tamanho pela metade a cada 502.
@@ -100,6 +107,10 @@ def montar_query_busca() -> str:
                     isArchived
                     defaultBranchRef {
                         name
+                    }
+                    hasDiscussionsEnabled
+                    fundingLinks {
+                        platform
                     }
                     pullRequests(states: MERGED, first: $amostraPrs, orderBy: {field: CREATED_AT, direction: DESC}) {
                         totalCount
@@ -180,6 +191,7 @@ def coletar(quantidade: int | None = None, token: str | None = None) -> list[dic
             linguagem = repo["primaryLanguage"]
             licenca = repo["licenseInfo"]
             branch_padrao = repo["defaultBranchRef"]
+            plataformas_funding = [link["platform"] for link in repo["fundingLinks"]]
             autores_prs = [
                 pr["author"]["login"] if pr["author"] else None
                 for pr in repo["pullRequests"]["nodes"]
@@ -200,6 +212,9 @@ def coletar(quantidade: int | None = None, token: str | None = None) -> list[dic
                     "licenca": licenca["name"] if licenca else "N/A",
                     "arquivado": repo["isArchived"],
                     "branch_padrao": branch_padrao["name"] if branch_padrao else "N/A",
+                    "discussions_habilitado": repo["hasDiscussionsEnabled"],
+                    "possui_funding": bool(plataformas_funding),
+                    "plataformas_funding": ";".join(plataformas_funding) if plataformas_funding else "N/A",
                     "issues_fechadas": fechadas,
                     "issues_total": total_issues,
                     "razao_issues_fechadas": calcular_razao_issues(fechadas, total_issues),
@@ -222,6 +237,7 @@ CAMPOS_CSV = [
     "total_releases",
     "ultima_atualizacao", "dias_desde_atualizacao",
     "linguagem_primaria", "licenca", "arquivado", "branch_padrao",
+    "discussions_habilitado", "possui_funding", "plataformas_funding",
     "issues_fechadas", "issues_total", "razao_issues_fechadas",
     "top_contribuidor", "concentracao_top_contribuidor",
 ]

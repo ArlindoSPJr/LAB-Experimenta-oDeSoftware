@@ -34,6 +34,14 @@
 *Métrica: `defaultBranchRef.name` do repositório.*
 *Resposta: A maioria deve usar "main", já que o GitHub passou a criar novos repositórios com esse nome por padrão desde 2020 e incentivou a migração de repositórios antigos. Repositórios mais antigos e populares, porém, podem manter "master" caso nunca tenham feito a migração manual.*
 
+**RQ X - Sistemas populares adotam GitHub Discussions como canal de comunidade, além de Issues/PRs?**
+*Métrica: `hasDiscussionsEnabled` do repositório.*
+*Resposta: Não deve ser maioria. Discussions é um recurso opcional e mais recente que Issues; repositórios populares tendem a já ter um fluxo de comunidade consolidado em Issues/PRs (e às vezes em canais externos, como Discord/Slack), então esperamos habilitação relevante só numa minoria — mais comum em projetos grandes com necessidade de separar dúvidas de uso de bugs reais.*
+
+**RQ XI - Sistemas populares recebem apoio financeiro direto via GitHub Sponsors/funding?**
+*Métrica: presença de `fundingLinks` (lista de plataformas de financiamento configuradas).*
+*Resposta: Deve ser uma minoria pequena. Configurar `fundingLinks` exige uma ação deliberada do mantenedor (criar `FUNDING.yml`), e nem todo projeto popular tem um mantenedor individual buscando patrocínio — muitos são mantidos por empresas ou organizações que já monetizam o produto por outra via, então esperamos essa métrica concentrada em projetos individuais/comunitários.*
+
 
 **SEÇÃO II - Metodologia de coleta**
 
@@ -41,13 +49,13 @@
 
 *Critério de seleção: os 1.000 repositórios com maior número de estrelas no GitHub, via `search(query: "stars:>1 sort:stars-desc", type: REPOSITORY)`.*
 
-*Coleta consolidada: uma única query GraphQL (`Lab01/src/queries/consolidada.py`) traz, numa única passada por repositório, todos os campos usados pelas RQ I a IX e pelas métricas bônus (concentração do maior contribuidor, forks, licença): data de criação, data da última atualização, linguagem primária, licença, status de arquivamento, branch padrão, total de releases, total de PRs aceitas (com os autores de uma amostra das 30 PRs mais recentes) e issues (abertas/fechadas).*
+*Coleta consolidada: uma única query GraphQL (`Lab01/src/queries/consolidada.py`) traz, numa única passada por repositório, todos os campos usados pelas RQ I a XI e pelas métricas bônus (concentração do maior contribuidor, forks, licença): data de criação, data da última atualização, linguagem primária, licença, status de arquivamento, branch padrão, Discussions habilitado, plataformas de financiamento (funding), total de releases, total de PRs aceitas (com os autores de uma amostra das 30 PRs mais recentes) e issues (abertas/fechadas).*
 
 *Paginação: via cursor (`after`), com tamanho de página adaptativo — a busca começa pedindo 25 repositórios por página e reduz o tamanho pela metade automaticamente quando a API responde com erro 502 (o resolver do GitHub estoura o timeout interno por causa das 4 conexões aninhadas por repositório: pullRequests, releases e as 2 variações de issues), com até 4 tentativas por página e espera crescente entre elas, até reunir os 1.000 repositórios.*
 
-*Validação incremental: cada métrica foi primeiro implementada e testada isoladamente numa amostra pequena de 5–10 repositórios (scripts individuais `rq01.py` a `rq09.py` e `rq_bonus_*.py`, com saída em `Lab01/data/amostras/`), antes de ser integrada à query única de coleta em massa — evitando gastar tempo/requisições rodando os 1.000 repositórios com uma métrica ainda não validada.*
+*Validação incremental: cada métrica foi primeiro implementada e testada isoladamente numa amostra pequena de 5–10 repositórios (scripts individuais `rq01.py` a `rq11.py` e `rq_bonus_*.py`, com saída em `Lab01/data/amostras/`), antes de ser integrada à query única de coleta em massa — evitando gastar tempo/requisições rodando os 1.000 repositórios com uma métrica ainda não validada.*
 
-*Armazenamento: resultado salvo em CSV (`Lab01/data/dataset/coleta_1000.csv`), com 998 repositórios válidos coletados dos 1.000 buscados. Última coleta completa realizada em 20/08/2026 — ainda não inclui as colunas de arquivamento (RQ VIII) e branch padrão (RQ IX), adicionadas depois; requer nova rodada de coleta para preencher os resultados dessas duas RQs na Seção IV.*
+*Armazenamento: resultado salvo em CSV (`Lab01/data/dataset/coleta_1000.csv`), com 998 repositórios válidos coletados dos 1.000 buscados. Última coleta completa realizada em 20/08/2026 — ainda não inclui as colunas de arquivamento (RQ VIII), branch padrão (RQ IX), Discussions (RQ X) e funding (RQ XI), adicionadas depois; requer nova rodada de coleta para preencher os resultados dessas RQs na Seção IV.*
 
 *Testes automatizados: a partir da Sprint02, toda métrica nova passou a exigir teste unitário correspondente (mockando a resposta da API), rodado automaticamente via GitHub Actions a cada push/PR para a `main` (`Lab01/tests/`, `.github/workflows/tests.yml`).*
 
@@ -137,4 +145,17 @@
 **RQ VII - Sistemas escritos em linguagens mais populares recebem mais contribuição externa, lançam mais releases e são atualizados com mais frequência?**
 *Hipótese: não necessariamente, pois há repositórios ativos e muito contribuídos escritos em linguagens mais antigas.*
 *Resultado: cruzando RQ02/RQ03/RQ04 por linguagem, TypeScript (mediana de 1.979 PRs e 134 releases), Go (1.958 PRs, 140 releases) e Rust (2.212 PRs, 75 releases) superam claramente Python (559 PRs, 20 releases) e JavaScript (630,5 PRs, 38 releases) em contribuição e frequência de releases, mesmo Python sendo a linguagem líder do TIOBE e a mais frequente nesta amostra. Todas as linguagens analisadas, porém, seguem com mediana de 0 dias desde a última atualização, ou seja, a frequência de atualização não varia por linguagem. A hipótese se confirma parcialmente: não há relação direta entre "linguagem mais popular" (no sentido do TIOBE) e mais contribuição/releases — o fator determinante parece ser o ecossistema/tipo de projeto (bibliotecas e ferramentas em TypeScript/Go/Rust) mais do que o ranking geral da linguagem.*
+
+
+**SEÇÃO V - Configuração do Processo**
+
+*Ferramenta: GitHub Projects (v2), vinculado ao repositório do grupo — [github.com/users/ArlindoSPJr/projects/3/views/1](https://github.com/users/ArlindoSPJr/projects/3/views/1).*
+
+*Colunas (campo Status): `Backlog → To Do → Doing → Review → Done`. Cartões são sempre Issues reais do repositório (nunca draft issues soltas), cada uma com Assignee definido, e o board é atualizado em tempo real conforme o progresso do trabalho — nunca retroativamente.*
+
+*Limite de WIP: 3 itens na coluna Doing, um por integrante do trio. A ideia é garantir que cada pessoa tenha no máximo uma tarefa em andamento por vez, evitando fragmentação de foco e commits parciais desorganizados — cada integrante só puxa uma nova tarefa para Doing depois de mover a anterior para Review/Done.*
+
+*Rastreabilidade: todo commit referencia o número da Issue correspondente (ex.: `#45 implementação e validação RQ8`), permitindo ao GitHub vincular automaticamente commit ↔ Issue no histórico do board.*
+
+*Print do board: 
 
