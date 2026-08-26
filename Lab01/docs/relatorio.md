@@ -36,25 +36,24 @@
 *Resposta: Não deve ser maioria. Discussions é um recurso opcional e mais recente que Issues; repositórios populares tendem a já ter um fluxo de comunidade consolidado em Issues/PRs (e às vezes em canais externos, como Discord/Slack), então esperamos habilitação relevante só numa minoria — mais comum em projetos grandes com necessidade de separar dúvidas de uso de bugs reais.*
 
 **RQ XI - Sistemas populares recebem apoio financeiro direto via GitHub Sponsors/funding?**
-*Métrica: presença de `fundingLinks` (lista de plataformas de financiamento configuradas).*
 *Resposta: Deve ser uma minoria pequena. Configurar `fundingLinks` exige uma ação deliberada do mantenedor (criar `FUNDING.yml`), e nem todo projeto popular tem um mantenedor individual buscando patrocínio — muitos são mantidos por empresas ou organizações que já monetizam o produto por outra via, então esperamos essa métrica concentrada em projetos individuais/comunitários.*
 
 
 **SEÇÃO II - Metodologia de coleta**
 
-*Fonte e ferramenta: API GraphQL do GitHub (`https://api.github.com/graphql`), consumida por script próprio em Python (só biblioteca padrão, sem dependências de terceiros para acesso à API — ver `Lab01/src/github_client.py`), autenticado via Personal Access Token com escopos `public_repo` e `read:project`.*
+*Fonte e ferramenta: API GraphQL do GitHub, consumida por script próprio em Python, autenticado via Personal Access Token com escopos `public_repo` e `read:project`.*
 
-*Critério de seleção: os 1.000 repositórios com maior número de estrelas no GitHub, via `search(query: "stars:>1 sort:stars-desc", type: REPOSITORY)`.*
+*Critério de seleção: os 1.000 repositórios com maior número de estrelas no GitHub.*
 
-*Coleta consolidada: uma única query GraphQL (`Lab01/src/queries/consolidada.py`) traz, numa única passada por repositório, todos os campos usados pelas RQ I a XI e pelas métricas bônus (concentração do maior contribuidor, forks, licença): data de criação, data da última atualização, linguagem primária, licença, status de arquivamento, branch padrão, Discussions habilitado, plataformas de financiamento (funding), total de releases, total de PRs aceitas (com os autores de uma amostra das 30 PRs mais recentes) e issues (abertas/fechadas).*
+*Coleta consolidada: uma única query GraphQL traz, numa única passada por repositório, todos os campos usados pelas RQ I a XI e pelas métricas bônus (concentração do maior contribuidor, forks, licença): data de criação, data da última atualização, linguagem primária, licença, status de arquivamento, branch padrão, Discussions habilitado, plataformas de financiamento (funding), total de releases, total de PRs aceitas (com os autores de uma amostra das 30 PRs mais recentes) e issues (abertas/fechadas).*
 
-*Paginação: via cursor (`after`), com tamanho de página adaptativo — a busca começa pedindo 25 repositórios por página e reduz o tamanho pela metade automaticamente quando a API responde com erro 502 ou 504 (o resolver do GitHub estoura o timeout interno por causa das 4 conexões aninhadas por repositório: pullRequests, releases e as 2 variações de issues), com até 4 tentativas por página e espera crescente entre elas, até reunir os 1.000 repositórios.*
+*Paginação: via cursor, com tamanho de página adaptativo, a busca começa pedindo 25 repositórios por página e reduz o tamanho pela metade automaticamente quando a API responde com erro 502 ou 504, com até 4 tentativas por página e espera crescente entre elas, até reunir os 1.000 repositórios.*
 
-*Validação incremental: cada métrica foi primeiro implementada e testada isoladamente numa amostra pequena de 5–10 repositórios (scripts individuais `rq01.py` a `rq11.py` e `rq_bonus_*.py`, com saída em `Lab01/data/amostras/`), antes de ser integrada à query única de coleta em massa — evitando gastar tempo/requisições rodando os 1.000 repositórios com uma métrica ainda não validada.*
+*Validação incremental: cada métrica foi primeiro implementada e testada isoladamente numa amostra pequena de 5–10 repositórios, após a coleta é feito o push/PR para a main, onde passam por testes usando a biblioteca `pytest`, antes de ser integrada à query única de coleta em massa, evitando gastar tempo/requisições rodando os 1.000 repositórios com uma métrica ainda não validada.*
 
-*Armazenamento: resultado salvo em CSV (`Lab01/data/dataset/coleta_1000.csv`), com 996 repositórios válidos coletados dos 1.000 buscados. Última coleta completa realizada em 26/08/2026, já incluindo as colunas de arquivamento (RQ VIII), branch padrão (RQ IX), Discussions (RQ X) e funding (RQ XI).*
+*Armazenamento: resultado salvo em CSV, com 1000 repositórios válidos coletados.
 
-*Testes automatizados: a partir da Sprint02, toda métrica nova passou a exigir teste unitário correspondente (mockando a resposta da API), rodado automaticamente via GitHub Actions a cada push/PR para a `main` (`Lab01/tests/`, `.github/workflows/tests.yml`).*
+*Testes automatizados: a partir da Sprint02, toda métrica nova passou a exigir teste unitário correspondente, rodado automaticamente via GitHub Actions a cada push/PR para a `main` .*
 
 
 **SEÇÃO III - Resultados por RQ**
@@ -186,11 +185,13 @@
 
 *Ferramenta: GitHub Projects (v2), vinculado ao repositório do grupo — [github.com/users/ArlindoSPJr/projects/3/views/1](https://github.com/users/ArlindoSPJr/projects/3/views/1).*
 
-*Colunas (campo Status): `Backlog → To Do → Doing → Review → Done`. Cartões são sempre Issues reais do repositório (nunca draft issues soltas), cada uma com Assignee definido, e o board é atualizado em tempo real conforme o progresso do trabalho — nunca retroativamente.*
+*Colunas: `Backlog → To Do → Doing → Review → Done`. Cards são sempre Issues reais do repositório, cada uma com Assignee definido, e o board é atualizado em tempo real conforme o progresso do trabalho, nunca retroativamente.*
 
 *Limite de WIP: 3 itens na coluna Doing, um por integrante do trio. A ideia é garantir que cada pessoa tenha no máximo uma tarefa em andamento por vez, evitando fragmentação de foco e commits parciais desorganizados — cada integrante só puxa uma nova tarefa para Doing depois de mover a anterior para Review/Done.*
 
 *Rastreabilidade: todo commit referencia o número da Issue correspondente (ex.: `#45 implementação e validação RQ8`), permitindo ao GitHub vincular automaticamente commit ↔ Issue no histórico do board.*
 
-*Print do board: 
+*Print do board:*
+
+![Print do board no GitHub Projects](images/image.png)
 
