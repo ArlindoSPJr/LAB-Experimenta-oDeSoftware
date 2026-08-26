@@ -93,3 +93,16 @@
 *Hipótese: não necessariamente, pois há repositórios ativos e muito contribuídos escritos em linguagens mais antigas.*
 *Resultado: cruzando RQ02/RQ03/RQ04 por linguagem, TypeScript (mediana de 1.979 PRs e 134 releases), Go (1.958 PRs, 140 releases) e Rust (2.212 PRs, 75 releases) superam claramente Python (559 PRs, 20 releases) e JavaScript (630,5 PRs, 38 releases) em contribuição e frequência de releases, mesmo Python sendo a linguagem líder do TIOBE e a mais frequente nesta amostra. Todas as linguagens analisadas, porém, seguem com mediana de 0 dias desde a última atualização, ou seja, a frequência de atualização não varia por linguagem. A hipótese se confirma parcialmente: não há relação direta entre "linguagem mais popular" (no sentido do TIOBE) e mais contribuição/releases — o fator determinante parece ser o ecossistema/tipo de projeto (bibliotecas e ferramentas em TypeScript/Go/Rust) mais do que o ranking geral da linguagem.*
 
+
+**SEÇÃO V - Configuração do Processo**
+
+*Ferramenta: GitHub Projects (v2), vinculado ao repositório do grupo — [github.com/users/ArlindoSPJr/projects/3/views/1](https://github.com/users/ArlindoSPJr/projects/3/views/1).*
+
+*Colunas (campo Status): `Backlog → To Do → Doing → Review → Done`. Cartões são sempre Issues reais do repositório (nunca draft issues soltas), cada uma com Assignee definido, e o board é atualizado em tempo real conforme o progresso do trabalho — nunca retroativamente.*
+
+*Limite de WIP: 3 itens na coluna Doing, um por integrante do trio. A ideia é garantir que cada pessoa tenha no máximo uma tarefa em andamento por vez, evitando fragmentação de foco e commits parciais desorganizados — cada integrante só puxa uma nova tarefa para Doing depois de mover a anterior para Review/Done.*
+
+*Rastreabilidade: todo commit referencia o número da Issue correspondente (ex.: `#45 implementação e validação RQ8`), permitindo ao GitHub vincular automaticamente commit ↔ Issue no histórico do board.*
+
+*Print do board: 
+
