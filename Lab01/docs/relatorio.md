@@ -27,15 +27,12 @@
 *Resposta: Não necessariamente, existem diversos repositórios ativos que recebem uma alta taxa de contribuição, mas que são escritos em linguagens antigas.*
 
 **RQ VIII - Sistemas populares raramente são arquivados/descontinuados?**
-*Métrica: `isArchived` do repositório.*
-*Resposta: Sim, é esperado que a grande maioria dos repositórios populares esteja ativa — um projeto precisa de manutenção contínua para atrair e manter estrelas, então o arquivamento (abandono formal declarado pelo dono) deve ser raro nesse grupo, mesmo entre os mais antigos.*
+*Resposta: Sim, é esperado que a grande maioria dos repositórios populares esteja ativa, um projeto precisa de manutenção contínua para atrair e manter estrelas, então o arquivamento deve ser raro nesse grupo, mesmo entre os mais antigos.*
 
 **RQ IX - Sistemas populares já adotam "main" como branch padrão, em vez de "master"?**
-*Métrica: `defaultBranchRef.name` do repositório.*
 *Resposta: A maioria deve usar "main", já que o GitHub passou a criar novos repositórios com esse nome por padrão desde 2020 e incentivou a migração de repositórios antigos. Repositórios mais antigos e populares, porém, podem manter "master" caso nunca tenham feito a migração manual.*
 
 **RQ X - Sistemas populares adotam GitHub Discussions como canal de comunidade, além de Issues/PRs?**
-*Métrica: `hasDiscussionsEnabled` do repositório.*
 *Resposta: Não deve ser maioria. Discussions é um recurso opcional e mais recente que Issues; repositórios populares tendem a já ter um fluxo de comunidade consolidado em Issues/PRs (e às vezes em canais externos, como Discord/Slack), então esperamos habilitação relevante só numa minoria — mais comum em projetos grandes com necessidade de separar dúvidas de uso de bugs reais.*
 
 **RQ XI - Sistemas populares recebem apoio financeiro direto via GitHub Sponsors/funding?**
@@ -51,18 +48,18 @@
 
 *Coleta consolidada: uma única query GraphQL (`Lab01/src/queries/consolidada.py`) traz, numa única passada por repositório, todos os campos usados pelas RQ I a XI e pelas métricas bônus (concentração do maior contribuidor, forks, licença): data de criação, data da última atualização, linguagem primária, licença, status de arquivamento, branch padrão, Discussions habilitado, plataformas de financiamento (funding), total de releases, total de PRs aceitas (com os autores de uma amostra das 30 PRs mais recentes) e issues (abertas/fechadas).*
 
-*Paginação: via cursor (`after`), com tamanho de página adaptativo — a busca começa pedindo 25 repositórios por página e reduz o tamanho pela metade automaticamente quando a API responde com erro 502 (o resolver do GitHub estoura o timeout interno por causa das 4 conexões aninhadas por repositório: pullRequests, releases e as 2 variações de issues), com até 4 tentativas por página e espera crescente entre elas, até reunir os 1.000 repositórios.*
+*Paginação: via cursor (`after`), com tamanho de página adaptativo — a busca começa pedindo 25 repositórios por página e reduz o tamanho pela metade automaticamente quando a API responde com erro 502 ou 504 (o resolver do GitHub estoura o timeout interno por causa das 4 conexões aninhadas por repositório: pullRequests, releases e as 2 variações de issues), com até 4 tentativas por página e espera crescente entre elas, até reunir os 1.000 repositórios.*
 
 *Validação incremental: cada métrica foi primeiro implementada e testada isoladamente numa amostra pequena de 5–10 repositórios (scripts individuais `rq01.py` a `rq11.py` e `rq_bonus_*.py`, com saída em `Lab01/data/amostras/`), antes de ser integrada à query única de coleta em massa — evitando gastar tempo/requisições rodando os 1.000 repositórios com uma métrica ainda não validada.*
 
-*Armazenamento: resultado salvo em CSV (`Lab01/data/dataset/coleta_1000.csv`), com 998 repositórios válidos coletados dos 1.000 buscados. Última coleta completa realizada em 20/08/2026 — ainda não inclui as colunas de arquivamento (RQ VIII), branch padrão (RQ IX), Discussions (RQ X) e funding (RQ XI), adicionadas depois; requer nova rodada de coleta para preencher os resultados dessas RQs na Seção IV.*
+*Armazenamento: resultado salvo em CSV (`Lab01/data/dataset/coleta_1000.csv`), com 996 repositórios válidos coletados dos 1.000 buscados. Última coleta completa realizada em 26/08/2026, já incluindo as colunas de arquivamento (RQ VIII), branch padrão (RQ IX), Discussions (RQ X) e funding (RQ XI).*
 
 *Testes automatizados: a partir da Sprint02, toda métrica nova passou a exigir teste unitário correspondente (mockando a resposta da API), rodado automaticamente via GitHub Actions a cada push/PR para a `main` (`Lab01/tests/`, `.github/workflows/tests.yml`).*
 
 
 **SEÇÃO III - Resultados por RQ**
 
-*Base: coleta consolidada com 998 repositórios válidos (de 1.000 buscados) em `Lab01/data/dataset/coleta_1000.csv`.*
+*Base: coleta consolidada com 996 repositórios válidos (de 1.000 buscados) em `Lab01/data/dataset/coleta_1000.csv`.*
 
 **RQ I - Idade do repositório**
 *Mediana: 7,72 anos | Mínimo: 0,02 anos | Máximo: 18,36 anos*
@@ -74,7 +71,7 @@
 *Mediana: 39 releases | 286 repositórios (28,7%) sem nenhuma release*
 
 **RQ IV - Dias desde a última atualização**
-*Mediana: 0 dias | 998 repositórios (100%) atualizados nos últimos 30 dias*
+*Mediana: 0 dias | 996 repositórios (100%) atualizados nos últimos 30 dias*
 
 **RQ V - Linguagem primária (contagem por categoria, top 10)**
 
@@ -104,8 +101,26 @@
 | Go | 1.958 | 140 | 0 |
 | Rust | 2.212 | 75 | 0 |
 
-**RQ VIII - Status de arquivamento** e **RQ IX - Branch padrão**
-*Pendente: as colunas `arquivado` e `branch_padrao` foram adicionadas à coleta consolidada depois da última rodada completa (20/08/2026). Requer nova execução de `python -m src.queries.consolidada` com os 1.000 repositórios para gerar os valores.*
+**RQ VIII - Status de arquivamento**
+*26 repositórios arquivados (2,6%) | 970 repositórios ativos (97,4%)*
+
+**RQ IX - Branch padrão (contagem por categoria, top 5)**
+
+| Branch padrão | Repositórios |
+|---|---|
+| main | 487 (48,9%) |
+| master | 411 (41,3%) |
+| develop | 28 |
+| dev | 22 |
+| canary | 5 |
+
+**RQ X - GitHub Discussions habilitado**
+*569 repositórios (57,1%) com Discussions habilitado | 427 (42,9%) sem*
+
+**RQ XI - Apoio financeiro via funding (Sponsors e afins)**
+*374 repositórios (37,6%) com pelo menos uma plataforma de funding configurada | 622 (62,4%) sem*
+
+*Plataformas mais comuns entre os 374 com funding: GitHub Sponsors (297), CUSTOM/link próprio (121), Open Collective (111), Patreon (38), Ko-fi (25).*
 
 **Bônus - Métricas complementares**
 *Forks: mediana de 6.348 (mínimo 39, máximo 109.021).*
@@ -115,7 +130,7 @@
 
 **SEÇÃO IV - Discussão hipóteses vs Resultado**
 
-*Base: coleta consolidada com 998 repositórios válidos (de 1.000 buscados) em `Lab01/data/dataset/coleta_1000.csv`.*
+*Base: coleta consolidada com 996 repositórios válidos (de 1.000 buscados) em `Lab01/data/dataset/coleta_1000.csv`.*
 
 **RQ I - Sistemas populares são maduros/antigos?**
 *Hipótese: tendem a ser mais antigos pela confiabilidade, mas não é regra, repositórios novos também podem viralizar.*
@@ -146,8 +161,28 @@
 *Hipótese: não necessariamente, pois há repositórios ativos e muito contribuídos escritos em linguagens mais antigas.*
 *Resultado: cruzando RQ02/RQ03/RQ04 por linguagem, TypeScript (mediana de 1.979 PRs e 134 releases), Go (1.958 PRs, 140 releases) e Rust (2.212 PRs, 75 releases) superam claramente Python (559 PRs, 20 releases) e JavaScript (630,5 PRs, 38 releases) em contribuição e frequência de releases, mesmo Python sendo a linguagem líder do TIOBE e a mais frequente nesta amostra. Todas as linguagens analisadas, porém, seguem com mediana de 0 dias desde a última atualização, ou seja, a frequência de atualização não varia por linguagem. A hipótese se confirma parcialmente: não há relação direta entre "linguagem mais popular" (no sentido do TIOBE) e mais contribuição/releases — o fator determinante parece ser o ecossistema/tipo de projeto (bibliotecas e ferramentas em TypeScript/Go/Rust) mais do que o ranking geral da linguagem.*
 
+**RQ VIII - Sistemas populares raramente são arquivados/descontinuados?**
+*Hipótese: sim, arquivamento deveria ser raro, já que um projeto precisa de manutenção contínua para atrair e manter estrelas.*
+*Resultado: apenas 26 repositórios (2,6%) estão arquivados; 970 (97,4%) seguem ativos. Hipótese totalmente confirmada — o abandono formal é exceção mesmo entre os mais populares, reforçando o achado da RQ IV de que praticamente nenhum repositório popular está de fato inativo.*
+
+**RQ IX - Sistemas populares já adotam "main" como branch padrão, em vez de "master"?**
+*Hipótese: a maioria deveria usar "main", pelo padrão do GitHub desde 2020, mas repositórios antigos poderiam manter "master".*
+*Resultado: 487 repositórios (48,9%) usam "main" e 411 (41,3%) ainda usam "master", com o restante (9,8%) em variações como "develop", "dev" e "canary". A hipótese se confirma apenas parcialmente: "main" é levemente mais frequente, mas a diferença é pequena — quase metade dos repositórios populares nunca migrou de "master", indicando que a mudança de padrão do GitHub não se propagou de forma decisiva para os projetos mais antigos e estabelecidos, coerente com a idade mediana alta encontrada na RQ I.*
+
+**RQ X - Sistemas populares adotam GitHub Discussions como canal de comunidade, além de Issues/PRs?**
+*Hipótese: não deveria ser maioria, por ser um recurso opcional e mais recente que Issues.*
+*Resultado: 569 repositórios (57,1%) têm Discussions habilitado, contra 427 (42,9%) sem. A hipótese não se confirma: Discussions já está habilitado na maioria dos repositórios populares, sugerindo que o recurso foi amplamente adotado como canal complementar de comunidade, e não ficou restrito a uma minoria de projetos grandes como se esperava.*
+
+**RQ XI - Sistemas populares recebem apoio financeiro direto via GitHub Sponsors/funding?**
+*Hipótese: deveria ser uma minoria pequena, já que configurar funding exige ação deliberada do mantenedor e muitos projetos populares são mantidos por empresas que já monetizam por outra via.*
+*Resultado: 374 repositórios (37,6%) têm ao menos uma plataforma de funding configurada, com GitHub Sponsors (297), links customizados (121) e Open Collective (111) como as mais comuns. A hipótese se confirma parcialmente: a maioria (62,4%) ainda não tem funding configurado, mas a minoria com funding é bem maior do que uma "minoria pequena" — mais de 1 em cada 3 repositórios populares já monetiza de alguma forma, sugerindo que a prática está mais difundida do que o esperado.*
+
+*GitHub Sponsors é o programa de financiamento nativo do GitHub: permite que qualquer usuário ou organização configure uma página de patrocínio vinculada diretamente ao seu perfil/repositório, pela qual outros usuários podem contribuir com valores recorrentes ou únicos, sem sair da plataforma. É a plataforma de funding mais simples de habilitar (basta ativar nas configurações do perfil/repositório, sem precisar de um `FUNDING.yml` apontando para serviços externos), o que ajuda a explicar por que ela é a mais comum entre as encontradas na amostra.*
+
 
 **SEÇÃO V - Configuração do Processo**
+
+*Repositório do grupo: [github.com/ArlindoSPJr/LAB-Experimenta-oDeSoftware](https://github.com/ArlindoSPJr/LAB-Experimenta-oDeSoftware).*
 
 *Ferramenta: GitHub Projects (v2), vinculado ao repositório do grupo — [github.com/users/ArlindoSPJr/projects/3/views/1](https://github.com/users/ArlindoSPJr/projects/3/views/1).*
 

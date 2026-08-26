@@ -74,7 +74,8 @@ def _buscar_pagina_com_retry(cursor: str | None, tamanho_pagina: int, token: str
         except GitHubGraphQLError as erro:
             esgotou_tentativas = tentativa == TENTATIVAS_POR_OFFSET
             no_piso = tamanho_pagina <= TAMANHO_PAGINA_MINIMO
-            if "502" not in str(erro) or (esgotou_tentativas and no_piso):
+            eh_timeout_transitorio = "502" in str(erro) or "504" in str(erro)
+            if not eh_timeout_transitorio or (esgotou_tentativas and no_piso):
                 raise
             time.sleep(ESPERA_BASE_SEGUNDOS * tentativa)
             tamanho_pagina = max(TAMANHO_PAGINA_MINIMO, tamanho_pagina // 2)
