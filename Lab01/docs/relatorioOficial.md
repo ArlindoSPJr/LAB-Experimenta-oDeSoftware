@@ -113,14 +113,14 @@ Números de issue fora desses (gaps não visualizados nos prints) não estão co
 
 | Sprint | Responsável | Issues (nº) | Entregas |
 |---|---|---|---|
-| Sprint 01 | Arlindo junior | #1,#2,#3,%5,#12,#20  |  gitHub projejects, Setup do client de comunicação com a API do GitHub,Implementação e validação das RQ's 1 e 3, Script de requisição automática, SnapShot de fehcamento da sprint |
-| Sprint 01 |  Arthur Astolfi |  #4,#6,#7,#8,#11 | Implementação e validação das RQ's 2, 4, 5 e 6 ; Consolidação query única do grupo |
-| Sprint 02 | Arlindo junior  | #22,#39,#32  | Paginação (Consulta para 1000 repositórios), Métrica de porcentagem de contribuição, Executar snapshot fechamento de sprint 02 |
+| Sprint 01 | Arlindo Júnior | #1,#2,#3,#5,#12,#20  |  GitHub Projects, Setup do client de comunicação com a API do GitHub, Implementação e validação das RQs 1 e 3, Script de requisição automática, snapshot de fechamento da sprint |
+| Sprint 01 |  Arthur Astolfi |  #4,#6,#7,#8,#11 | Implementação e validação das RQs 2, 4, 5 e 6; Consolidação query única do grupo |
+| Sprint 02 | Arlindo Júnior  | #22,#39,#32  | Paginação (Consulta para 1000 repositórios), Métrica de porcentagem de contribuição, Executar snapshot fechamento de sprint 02 |
 | Sprint 02 | Arthur Astolfi  | #38  | Front-end para exibição das métricas  |
 | Sprint 02 | Camila Melo  | #41 |  adicionando métricas bônus de forks e licença na query consolidada |
-| Sprint 03 | Arlindo junior | #23,#33,#36,#39,#43  | Primeira versão do relatório com hipóteses informais, Executar snapshot fechamento de sprint 03, Relatório final - Discussão hipótese vs. resultado,Métrica de porcentagem de contribuição, Pipeline de testes CI/CD |
-| Sprint 03 | Arthur Astolfi  | #31,#37,#47  | Relatório final - introdução com hipóteses informais sobre as RQs, Relatório final - Configuração do Processo, Implementação das RQ's extra 10 e 11  |
-| Sprint 03 | Camila Melo  | #34,#35,#41,#45,#46 | Relatório final - Metodologia de coleta, Relatório final - Resultados por RQ (valores medianos, contagem por categoria quando aplicável), Implementação e validação métricas bônus — Forks e Licença,  Validação  |
+| Sprint 03 | Arlindo Júnior | #23,#33,#36,#39,#43  | Primeira versão do relatório com hipóteses informais, Executar snapshot fechamento de sprint 03, Relatório final - Discussão hipótese vs. resultado, Métrica de porcentagem de contribuição, Pipeline de testes CI/CD |
+| Sprint 03 | Arthur Astolfi  | #31,#37,#47  | Relatório final - introdução com hipóteses informais sobre as RQs, Relatório final - Configuração do Processo, Implementação das RQs extra 10 e 11  |
+| Sprint 03 | Camila Melo  | #34,#35,#41,#45,#46 | Relatório final - Metodologia de coleta, Relatório final - Resultados por RQ (valores medianos, contagem por categoria quando aplicável), Implementação e validação métricas bônus — Forks e Licença, Validação  |
 
 #### Configuração do processo
 
@@ -205,14 +205,14 @@ O enunciado pede a mineração dos 1.000 repositórios com mais estrelas do GitH
 
 Não foi aplicado nenhum filtro de qualidade posterior à coleta: os 996 repositórios correspondem integralmente ao resultado bruto da busca `stars:>1 sort:stars-desc`, sem exclusão de nenhuma linha.
 
-A busca não impõe corte de período (não há filtro por `created:`/`pushed:` na query), de modo que o período coberto é "qualquer data de criação, até a data em que a coleta foi executada", cada repositório carrega sua própria `data_criacao` e `ultima_atualizacao` coletadas.
+A busca não impõe corte de período (não há filtro por `created:`/`pushed:` na query), de modo que o período coberto é "qualquer data de criação, até a data em que a coleta foi executada"; cada repositório carrega sua própria `data_criacao` e `ultima_atualizacao` coletadas.
 
 Dados ausentes foram tratados por campo, mantendo o repositório no dataset e marcando o campo específico como `"N/A"` em vez de descartar a linha:
 
 - **Linguagem primária** (`linguagem_primaria`): 88 dos 996 repositórios (≈8,8%) não têm `primaryLanguage` retornado pela API.
 - **Licença** (`licenca`): 82 dos 996 repositórios (≈8,2%) não têm `licenseInfo` declarado.
 
-Não foi feito tratamento de outliers (ex.: remoção de repositórios com valores extremos de estrelas, PRs ou idade), a análise das seções 4.2/4.3 usa mediana como medida de tendência central justamente para não exigir esse corte, dado que a distribuição de popularidade no GitHub é naturalmente assimétrica (poucos repositórios com contagens muito acima da maioria).
+Não foi feito tratamento de outliers (ex.: remoção de repositórios com valores extremos de estrelas, PRs ou idade); a análise das seções 4.2/4.3 usa mediana como medida de tendência central justamente para não exigir esse corte, dado que a distribuição de popularidade no GitHub é naturalmente assimétrica (poucos repositórios com contagens muito acima da maioria).
 
 ### 4.2 Visualização Gráfica
 
@@ -349,7 +349,7 @@ Resultado: **374 repositórios (37,6%)** têm ao menos uma plataforma de funding
 - **Teto de 1000 resultados da busca do GitHub:** a coleta ficou em 996 repositórios, não os 1000 do enunciado (detalhado em 4.1), o que não compromete a análise em volume, mas é uma limitação da API, não do desenho do estudo.
 - **Fonte única para RQ05:** o TIOBE Index mede popularidade de uso geral de mercado (buscas, vagas), não atividade específica em código aberto no GitHub — a comparação da RQ05/RQ07 é, portanto, entre duas noções diferentes de "popularidade de linguagem", não uma validação direta.
 - **Coleta em instante único (snapshot):** todas as métricas (idade, atualização, PRs, releases etc.) refletem o estado dos repositórios no momento exato da coleta; um repositório pode ter mudado de status (ex.: sido arquivado, migrado de branch) logo depois.
-- **Viés de sobrevivência:** a amostra cobre apenas repositórios que existem e estão no topo de estrelas hoje, projetos populares que foram deletados, tornados privados ou perderam popularidade no passado não entram na análise.
+- **Viés de sobrevivência:** a amostra cobre apenas repositórios que existem e estão no topo de estrelas hoje; projetos populares que foram deletados, tornados privados ou perderam popularidade no passado não entram na análise.
 
 **Relação com as inovações do grupo**
 
@@ -374,9 +374,3 @@ Vale reforçar as limitações já discutidas em 4.3: não rodamos nenhum teste 
 Se fôssemos refazer esse laboratório, com certeza optaríamos por um filtro melhor na hora de selecionar os repositórios, buscando só aqueles que de fato fornecem todos os dados exigidos pelas RQs, em vez de aceitar qualquer repositório retornado pela busca e lidar com os `N/A` depois, como fizemos aqui. O problema é que isso teria um custo: a API do GitHub já limita a busca a 1000 resultados no total, e filtrar por completude de dados reduziria ainda mais esse número, então provavelmente sairíamos com uma amostra menor (e talvez menos representativa do "top" real) em troca de um dataset mais limpo. É uma troca que valeria a pena avaliar com calma antes de decidir. E se tivesse que escolher uma inovação para aprofundar, seria a RQ07: o cruzamento por linguagem deixou claro que o que importa é o ecossistema, não o ranking geral da linguagem, e vale a pena investigar isso mais a fundo categorizando por tipo de projeto também.
 
 ---
-
-## 6. Referências
-
-<!-- Inclua aqui somente referências que o grupo de fato usou e verificou. -->
-
-- [ ]
